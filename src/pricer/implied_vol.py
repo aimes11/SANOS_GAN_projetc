@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from bs import BSInputs, price, forward, discount
+from src.pricer.bs import BSInputs, price, forward, discount
 
 OptionType = Literal["call", "put" ]
 

@@ -21,22 +21,21 @@ class BSInputs:
         self.strike = float(strike)
         self.ttm = float(ttm)
         self.rate = float(rate)
-        self.div = float(vol)
+        self.div = float(div)
         self.vol = float(vol)
 
     def __repr__(self) -> str:
         #To facilitate debug we show directly the parameters rather then the adress
         return(
-            f'BSInputs(spot = {self.spot}, strike = {self.strike}, ttm = {self.ttm}, rate = {self.rate}, div = {self.div}, vol = {self.rate})'
-        )
+            f'BSInputs(spot = {self.spot}, strike = {self.strike}, ttm = {self.ttm}, rate = {self.rate}, div = {self.div}, vol = {self.vol})')
     
 def forward (spot: float, rate: float, div: float, ttm: float) -> float:
     """Forward price F = S * exp((r - d) * T)"""
     return spot * math.exp((rate - div) * ttm)
 
-def discount(rate: float, div: float, ttm: float) -> float:
+def discount(rate: float, ttm: float) -> float:
     """Discounting function D = exp(- (r - d) * T)"""
-    return math.exp(-(rate - div) * ttm)
+    return math.exp(- rate * ttm)
 
 def d1_d2( F: float, strike: float, vol: float, ttm: float) -> tuple[float, float]:
     if F <= 0 or strike <= 0:
@@ -69,7 +68,7 @@ def price(inp: BSInputs, opt_type: OptionType = "call") -> float:
     if T == 0:
         return max(S - K, 0) if opt_type == "call" else max(K - S, 0)
     
-    D = discount(r, d, T)
+    D = discount(r, T)
     F = forward(S, r, d, T)
 
     if sig == 0:
@@ -89,7 +88,7 @@ def vega(inp: BSInputs) -> float:
         raise ValueError('S and K must be > 0')
     if T < 0 or sig <= 0:
         return 0.0
-    D = discount(r, d, T)
+    D = discount(r, T)
     F = forward(S, r, d, T)
 
     d1, _ = d1_d2(F, K, sig, T)
